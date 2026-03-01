@@ -30,6 +30,13 @@ void Executer::execute(const std::vector<std::string> &tokens)
           break;
        }
     }
+
+    bool background = false;
+
+    if (!newTokens.empty() && newTokens.back() == "&") {
+        background = true;
+        newTokens.pop_back();
+    }
     std::vector<const char *> argv;
 
     for (const std::string &token : newTokens)
@@ -71,5 +78,8 @@ int status = execvp(argv[0], const_cast<char *const *>(argv.data()));
     else if (pid == -1)
         std::cerr << tokens[0] << ": failed to execute command" << std::endl;
     else
-        waitpid(pid, nullptr, 0);
+        if (!background)
+    waitpid(pid, nullptr, 0);
+else
+    std::cout << "[background pid " << pid << "]" << std::endl;
 }
