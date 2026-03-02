@@ -17,11 +17,17 @@ void Executer::execute(const std::vector<std::string> &tokens)
 
     bool redirect = false;
     std::string outFile;
+    bool background = false;
 
     std::vector<std::string> cleanedTokens;
     cleanedTokens.reserve(tokens.size());
 
     for (size_t i = 0; i < tokens.size(); ++i) {
+        if (tokens[i] == "&" && i == tokens.size() - 1) {
+            background = true;
+            continue;
+        }
+
         if (tokens[i] == ">") {
             if (i + 1 < tokens.size()) {
                 redirect = true;
@@ -33,6 +39,7 @@ void Executer::execute(const std::vector<std::string> &tokens)
                 return;
             }
         }
+
         cleanedTokens.push_back(tokens[i]);
     }
 
@@ -85,6 +92,7 @@ void Executer::execute(const std::vector<std::string> &tokens)
     }
     else
     {
-        waitpid(pid, nullptr, 0);
+        if (!background)
+            waitpid(pid, nullptr, 0);
     }
 }
