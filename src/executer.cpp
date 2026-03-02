@@ -12,6 +12,24 @@
 
 void Executer::execute(const std::vector<std::string> &tokens)
 {
+    static std::vector<std::string> history;
+
+    if (!tokens.empty()) {
+        std::string line;
+        for (size_t i = 0; i < tokens.size(); ++i) {
+            if (i) line += " ";
+            line += tokens[i];
+        }
+        history.push_back(line);
+    }
+
+    if (!tokens.empty() && tokens[0] == "history") {
+        for (size_t i = 0; i < history.size(); ++i) {
+            std::cout << (i + 1) << " " << history[i] << "\n";
+        }
+        return;
+    }
+
     if (Builtins::handle(tokens))
         return;
 
