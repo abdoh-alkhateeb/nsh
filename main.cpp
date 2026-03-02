@@ -60,3 +60,19 @@ int main() {
 }
 
 
+bool background = false;
+if (!cmd.empty() && cmd.back() == '&') {
+    background = true;
+    cmd.pop_back(); // Remove &
+}
+pid_t pid = fork();
+if (pid == 0) {
+    if (!outfile.empty()) {
+        freopen(outfile.c_str(), "w", stdout);
+    }
+    execvp(args[0], args.data());
+    perror("execvp failed");
+    exit(1);
+} else {
+    if (!background) wait(nullptr);
+}
