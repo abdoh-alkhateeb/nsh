@@ -76,3 +76,9 @@ if (pid == 0) {
 } else {
     if (!background) wait(nullptr);
 }
+if (line == "history") {
+    for (size_t i = 0; i < history.size(); ++i) {
+        std::cout << i + 1 << " " << history[i] << std::endl;
+    }
+    continue;
+}
