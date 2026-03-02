@@ -3,8 +3,10 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <cstring>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <cstdlib>
 
 int main() {
     std::string line;
@@ -16,20 +18,29 @@ int main() {
         if (line.empty()) continue;
         history.push_back(line);
 
-        // Check for exit
         if (line == "exit") break;
+        if (line == "history") {
+            for (size_t i = 0; i < history.size(); ++i)
+                std::cout << i + 1 << " " << history[i] << std::endl;
+            continue;
+        }
 
-        // Output redirection
+        bool background = false;
+        size_t amp = line.find('&');
+        if (amp != std::string::npos) {
+            background = true;
+            line.erase(amp);
+        }
+
         std::string cmd = line;
         std::string outfile;
-        size_t pos = line.find(">");
+        size_t pos = line.find('>');
         if (pos != std::string::npos) {
             cmd = line.substr(0, pos);
             outfile = line.substr(pos + 1);
             outfile.erase(0, outfile.find_first_not_of(" "));
         }
 
-        // Tokenize command
         std::istringstream iss(cmd);
         std::vector<char*> args;
         std::string token;
@@ -49,36 +60,10 @@ int main() {
             perror("execvp failed");
             exit(1);
         } else {
-            wait(nullptr);
+            if (!background) wait(nullptr);
         }
 
-        // Free memory
         for (auto arg : args) delete[] arg;
     }
-
     return 0;
-}
-
-
-bool background = false;
-if (!cmd.empty() && cmd.back() == '&') {
-    background = true;
-    cmd.pop_back(); // Remove &
-}
-pid_t pid = fork();
-if (pid == 0) {
-    if (!outfile.empty()) {
-        freopen(outfile.c_str(), "w", stdout);
-    }
-    execvp(args[0], args.data());
-    perror("execvp failed");
-    exit(1);
-} else {
-    if (!background) wait(nullptr);
-}
-if (line == "history") {
-    for (size_t i = 0; i < history.size(); ++i) {
-        std::cout << i + 1 << " " << history[i] << std::endl;
-    }
-    continue;
 }
