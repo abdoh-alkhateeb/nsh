@@ -20,27 +20,35 @@ void Executer::execute(const std::vector<std::string> &tokens)
     for (const std::string &token : tokens)
         argv.push_back(token.c_str());
     argv.push_back(nullptr);
-
+    
+    bool Bg = false;
+    if (tokens[tokens.size() - 1] == "&")
+    {
+        Bg = true;
+        argv.pop_back(); // remove nullptr
+        argv.pop_back(); // remove "&"
+        argv.push_back(nullptr); // re-add terminator
+    }
     pid_t pid = fork();
 
     if (pid == 0)
     {
-        if(tokens[tokens.size() - 2] == ">"){
-                int file = open(tokens[tokens.size() - 1].c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
-                if (file < 0) {
-                    perror("open failed");
-                    return;
-                }
-                if (dup2(file, STDOUT_FILENO) < 0) {
-                    perror("dup2 failed");
-                    return;
-                }
 
-                close(file);
-                argv.pop_back(); // remove nullptr
-                argv.pop_back(); // remove filename
-                argv.pop_back(); // remove ">"
-                argv.push_back(nullptr); // re-add terminator
+        if(tokens[tokens.size() - 2] == ">"){
+            int file = open(tokens[tokens.size() - 1].c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
+            if (file < 0) {
+                perror("open failed");
+                return;
+            }
+            if (dup2(file, STDOUT_FILENO) < 0) {
+                perror("dup2 failed");
+                return;
+            }
+            close(file);
+            argv.pop_back(); // remove nullptr
+            argv.pop_back(); // remove filename
+            argv.pop_back(); // remove ">"
+            argv.push_back(nullptr); // re-add terminator
                 
         }
 
@@ -59,6 +67,8 @@ void Executer::execute(const std::vector<std::string> &tokens)
     else if (pid == -1)
         std::cerr << tokens[0] << ": failed to execute command" << std::endl;
     else
-        waitpid(pid, nullptr, 0);
+        if (!Bg){
+            waitpid(pid, nullptr, 0);
+        }
 }
 
