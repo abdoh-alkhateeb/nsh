@@ -4,12 +4,17 @@
 #include "sys/wait.h"
 #include <iostream>
 #include <vector>
+#include <fstream>
+#include <fcntl.h>  // for open, O_*, mode constants
+#include <stdio.h>  // for printf, perror
 
 void Executer::execute(const std::vector<std::string> &tokens)
 {
     if (Builtins::handle(tokens))
         return;
 
+
+        
     std::vector<const char *> argv;
 
     for (const std::string &token : tokens)
@@ -20,6 +25,25 @@ void Executer::execute(const std::vector<std::string> &tokens)
 
     if (pid == 0)
     {
+        if(tokens[tokens.size() - 2] == ">"){
+                int file = open(tokens[tokens.size() - 1].c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
+                if (file < 0) {
+                    perror("open failed");
+                    return;
+                }
+                if (dup2(file, STDOUT_FILENO) < 0) {
+                    perror("dup2 failed");
+                    return;
+                }
+
+                close(file);
+                argv.pop_back(); // remove nullptr
+                argv.pop_back(); // remove filename
+                argv.pop_back(); // remove ">"
+                argv.push_back(nullptr); // re-add terminator
+                
+        }
+
         int status = execvp(argv[0], const_cast<char *const *>(argv.data()));
 
         if (status != 0)
@@ -37,3 +61,4 @@ void Executer::execute(const std::vector<std::string> &tokens)
     else
         waitpid(pid, nullptr, 0);
 }
+
