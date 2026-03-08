@@ -2,11 +2,10 @@
 #include "unistd.h"
 #include "stdlib.h"
 #include <iostream>
- std::vector<std::string> Builtins::history;
+
 bool Builtins::handle(const std::vector<std::string> &tokens)
 {
-history.push_back(tokens[0]); 
-   if (tokens[0] == "exit")
+    if (tokens[0] == "exit")
         exit(EXIT_SUCCESS);
     else if (tokens[0] == "cd")
     {
@@ -34,10 +33,7 @@ history.push_back(tokens[0]);
 
         return true;
     }
-else if(tokens[0]=="history")
-{
-for(std::string t:tokens)
-std::cout<< t<<std::endl;
-return true;}
+
     return false;
 }
+std::vector <string> history(
