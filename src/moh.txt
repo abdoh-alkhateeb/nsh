@@ -1,0 +1,7 @@
+builtins.cpp
+executer.cpp
+main.cpp
+malak.txt
+moh.txt
+output.txt
+parser.cpp

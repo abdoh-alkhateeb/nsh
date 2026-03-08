@@ -1,0 +1,11 @@
+CMakeLists.txt
+LICENSE
+README.md
+build
+include
+main.cpp
+malak.txt
+myprog
+results
+results.txt
+src
