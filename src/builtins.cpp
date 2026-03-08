@@ -2,9 +2,15 @@
 #include "unistd.h"
 #include "stdlib.h"
 #include <iostream>
+#include <vector>
+#include <string>
+
+static std::vector<std::string>  historyList;
 
 bool Builtins::handle(const std::vector<std::string> &tokens)
 {
+    historyList.push_back(tokens[0]);
+
     if (tokens[0] == "exit")
         exit(EXIT_SUCCESS);
     else if (tokens[0] == "cd")
@@ -33,6 +39,13 @@ bool Builtins::handle(const std::vector<std::string> &tokens)
 
         return true;
     }
-
+else if (tokens[0] == "history")
+{
+	for (size_t i=0; i < historyList.size(); i++)
+	{
+	std::cout << i + 1 << " " << historyList[i]<< std::endl;
+	}
+	return true;
+}
     return false;
 }

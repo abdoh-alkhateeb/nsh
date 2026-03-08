@@ -4,15 +4,49 @@
 #include "sys/wait.h"
 #include <iostream>
 #include <vector>
+#include <fcntl.h>
 
 void Executer::execute(const std::vector<std::string> &tokens)
 {
+    if (tokens.empty())
+	return;
+
     if (Builtins::handle(tokens))
         return;
+    std::vector<std::string> commandTokens = tokens;
+    bool background = false;
+    std::string outputFile = "";
 
+    if (!commandTokens.empty() && commandTokens.back() ==  "&")
+    {
+	background = true;
+	commandTokens.pop_back();
+    }
+
+    for (size_t i=0; i < commandTokens.size(); i++)
+    {
+	if (commandTokens[i] == ">")
+	{
+	   if (i + 1 < commandTokens.size())
+	   {
+		outputFile = commandTokens[i + 1];
+		commandTokens.erase(commandTokens.begin() + 1, commandTokens.begin() + i + 2);
+	   }
+	   else
+	   {
+		std::cerr<<"No output file specified\n";
+		return;
+	   }
+	   break;
+	}
+}
+
+if (commandTokens.empty())
+	return;
+		
     std::vector<const char *> argv;
 
-    for (const std::string &token : tokens)
+    for (const std::string &token : commandTokens)
         argv.push_back(token.c_str());
     argv.push_back(nullptr);
 
