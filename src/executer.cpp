@@ -20,6 +20,15 @@ void Executer::execute (std::vector<std::string> &tokens)
         argv.push_back(token.c_str());
     argv.push_back(nullptr);
 
+bool background = false;
+if (!tokens.empty() && tokens.back() == "&" )
+{
+background = true;
+tokens.pop_back();
+}
+
+
+
     pid_t pid = fork();
 
     if (pid == 0)
@@ -69,5 +78,7 @@ void Executer::execute (std::vector<std::string> &tokens)
     else if (pid == -1)
         std::cerr << tokens[0] << ": failed to execute command" << std::endl;
     else
-        waitpid(pid, nullptr, 0);
+	if (!background) 
+
+		 waitpid(pid, nullptr, 0);
 }
