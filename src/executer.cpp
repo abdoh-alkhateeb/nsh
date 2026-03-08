@@ -4,36 +4,93 @@
 #include "sys/wait.h"
 #include <iostream>
 #include <vector>
+#include <fcntl.h>
+
 
 void Executer::execute(const std::vector<std::string> &tokens)
 {
-    if (Builtins::handle(tokens))
+    if (tokens.empty())
         return;
 
+    Builtins::add_history(tokens);
+
+    bool background = false;
+    std::string outfile;
     std::vector<const char *> argv;
 
-    for (const std::string &token : tokens)
-        argv.push_back(token.c_str());
+    for (size_t i = 0; i < tokens.size(); i++)
+    {
+        if (tokens[i] == "&" && i == tokens.size() - 1)
+        {
+            background = true;
+            break;
+        }
+
+        if (tokens[i] == ">")
+        {
+            if (i + 1 >= tokens.size())
+            {
+                std::cerr << "syntax error: expected file after >" << std::endl;
+                return;
+            }
+
+            outfile = tokens[i + 1];
+            break;
+        }
+
+        argv.push_back(tokens[i].c_str());
+    }
+
     argv.push_back(nullptr);
+
+    if (argv.empty())
+        return;
+
+    if (!background && Builtins::handle(tokens))
+        return;
 
     pid_t pid = fork();
 
     if (pid == 0)
     {
-        int status = execvp(argv[0], const_cast<char *const *>(argv.data()));
-
-        if (status != 0)
+        if (!outfile.empty())
         {
-            std::string msg = "failed to execute command";
+            int fd = open(outfile.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
 
-            if (errno == ENOENT)
-                msg = "command not found";
+            if (fd < 0)
+            {
+                std::cerr << "failed to open file: " << outfile << std::endl;
+                exit(EXIT_FAILURE);
+            }
 
-            std::cerr << tokens[0] << ": " << msg << std::endl;
+            dup2(fd, STDOUT_FILENO);
+            close(fd);
         }
+
+        execvp(argv[0], const_cast<char *const *>(argv.data()));
+
+        std::string msg = "failed to execute command";
+
+        if (errno == ENOENT)
+            msg = "command not found";
+
+        std::cerr << argv[0] << ": " << msg << std::endl;
+
+        exit(EXIT_FAILURE);
     }
     else if (pid == -1)
-        std::cerr << tokens[0] << ": failed to execute command" << std::endl;
+    {
+        std::cerr << "failed to execute command" << std::endl;
+    }
     else
-        waitpid(pid, nullptr, 0);
+    {
+        if (!background)
+        {
+            waitpid(pid, nullptr, 0);
+        }
+        else
+        {
+            std::cout << "[process running in background pid=" << pid << "]" << std::endl;
+        }
+    }
 }
