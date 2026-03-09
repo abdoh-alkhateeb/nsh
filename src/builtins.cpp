@@ -1,6 +1,7 @@
-#include "builtins.hpp"
 #include "unistd.h"
+#include "builtins.hpp"
 #include "stdlib.h"
+#include "parser.hpp"
 #include <iostream>
 
 bool Builtins::handle(const std::vector<std::string> &tokens)
@@ -32,6 +33,15 @@ bool Builtins::handle(const std::vector<std::string> &tokens)
         }
 
         return true;
+    }
+    else if(tokens[0] == "history")
+    {
+        std::vector<std::string> output = Parser::getHistory();
+        for(int i = 0; i < output.size(); i++)
+        {
+            std::cout << output[i];
+        }
+	return true;
     }
 
     return false;
