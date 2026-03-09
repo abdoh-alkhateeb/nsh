@@ -16,7 +16,7 @@ std::vector<std::string> Parser::parseInput(const std::string &input)
                 token.clear();
             }
         }
-        else if (ch == '>')
+        else if (ch == '>' || ch == '&')
         {
             if (!token.empty())
             {

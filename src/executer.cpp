@@ -16,7 +16,14 @@ void Executer::execute(const std::vector<std::string> &tokens)
         return;
 
     std::vector<std::string> commandTokens = tokens;
+    bool runInBackground = false;
     std::string outputFile;
+
+    if (!commandTokens.empty() && commandTokens.back() == "&")
+    {
+        runInBackground = true;
+        commandTokens.pop_back();
+    }
 
     for (size_t i = 0; i < commandTokens.size(); ++i)
     {
@@ -86,5 +93,8 @@ void Executer::execute(const std::vector<std::string> &tokens)
         }
     }
     else // parent process (pid > 0)
-        waitpid(pid, nullptr, 0);
+    {
+        if (!runInBackground)
+            waitpid(pid, nullptr, 0);
+    }
 }
