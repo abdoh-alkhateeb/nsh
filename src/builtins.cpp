@@ -2,9 +2,27 @@
 #include "unistd.h"
 #include "stdlib.h"
 #include <iostream>
+#include <vector>
+
+static std::vector<std::string> history;
 
 bool Builtins::handle(const std::vector<std::string> &tokens)
 {
+    if(tokens.empty())
+        return true;
+
+    history.push_back(tokens[0]);
+
+   
+    if (tokens[0] == "history")
+    {
+        for (size_t i = 0; i < history.size(); i++)
+        {
+            std::cout << i + 1 << " " << history[i] << std::endl;
+        }
+        return true;
+    }
+
     if (tokens[0] == "exit")
         exit(EXIT_SUCCESS);
     else if (tokens[0] == "cd")
