@@ -36,7 +36,7 @@ void Executer::execute(const std::vector<std::string> &tokens)
     std::vector<const char *> clean_argv;
     for (int i = 0; i < (int)tokens.size(); i++)
     {
-        if (tokens[i] == ">") break;
+        if (tokens[i] == ">" || tokens[i] == "&") break;
         clean_argv.push_back(tokens[i].c_str());
     }
     clean_argv.push_back(nullptr);
@@ -55,5 +55,14 @@ void Executer::execute(const std::vector<std::string> &tokens)
     else if (pid == -1)
         std::cerr << tokens[0] << ": failed to execute command" << std::endl;
     else
+{
+    bool background = false;
+    for (const std::string &token : tokens)
+        if (token == "&")
+            background = true;
+
+    if (!background)
         waitpid(pid, nullptr, 0);
 }
+}
+	
