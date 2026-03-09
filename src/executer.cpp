@@ -8,18 +8,23 @@
 
 void Executer::execute(const std::vector<std::string> &tokens)
 {
+    std::vector<std::string> args = tokens;
     int status;
+    bool existA = false;
     if (Builtins::handle(tokens))
         return;
 
+    if (tokens.back() == "&")
+    {
+        existA = true;
+        args.pop_back();
+    }
     std::vector<const char *> argv;
 
-    for (const std::string &token : tokens)
+    for (const std::string &token : args)
         argv.push_back(token.c_str());
     argv.push_back(nullptr);
-
     pid_t pid = fork();
-
     if (pid < 0) // fork failed
         std::cerr << tokens[0] << ": failed to execute command" << std::endl;
     else if (pid == 0) // child process
@@ -62,5 +67,10 @@ void Executer::execute(const std::vector<std::string> &tokens)
         }
     }
     else // parent process (pid > 0)
-        waitpid(pid, nullptr, 0);
+    {
+        if (!existA)
+        {
+            waitpid(pid, nullptr, 0);
+        }
+    }
 }
