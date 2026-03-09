@@ -2,10 +2,8 @@
 #include "executer.hpp"
 #include <iostream>
 
-int main()
-{
-    while (true)
-    {
+int main() {
+    while (true) {
         std::cout << "nsh> ";
         std::string input;
         std::getline(std::cin, input);
