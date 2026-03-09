@@ -1,4 +1,4 @@
 #include <iostream>
 /////
 ///
-int a;
+int b;
