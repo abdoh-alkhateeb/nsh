@@ -18,16 +18,19 @@ void Executer::execute(const std::vector<std::string> &tokens) {
 
     pid_t pid = fork();
 
+    bool bg = false;
     if (pid < 0) // fork failed
         std::cerr << tokens[0] << ": failed to execute command" << std::endl;
     else if (pid == 0) // child process
     {   
         bool redirect = false;
         int index;
-        for(int i=0; i<argv.size() && !redirect; i++){
+        for(int i=0; i<argv.size(); i++){
             if(argv[i][0] == '>') {
                 redirect = true;
                 index = i;
+            } else if(argv[i][0] == '&'){
+                bg = true;
             }
         }
         int status;
@@ -53,6 +56,8 @@ void Executer::execute(const std::vector<std::string> &tokens) {
             std::cerr << tokens[0] << ": " << msg << std::endl;
         }
     }
-    else // parent process (pid > 0)
-        waitpid(pid, nullptr, 0);
+    else{// parent process (pid > 0)
+        if(!bg)
+            waitpid(pid, nullptr, 0);
+    }
 }
