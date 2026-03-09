@@ -9,7 +9,7 @@
 
 void Executer::execute(const std::vector<std::string> &tokens)
 {
-    if (Builtins::handle(tokens))
+    if (Builtins::handle(tokens, {}))
         return;
 
     std::vector<const char *> argv;
