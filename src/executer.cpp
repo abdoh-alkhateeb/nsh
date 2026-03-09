@@ -4,9 +4,9 @@
 #include "sys/wait.h"
 #include <iostream>
 #include <vector>
+#include <fcntl.h>
 
-void Executer::execute(const std::vector<std::string> &tokens)
-{
+void Executer::execute(const std::vector<std::string> &tokens) {
     if (Builtins::handle(tokens))
         return;
 
@@ -21,8 +21,27 @@ void Executer::execute(const std::vector<std::string> &tokens)
     if (pid < 0) // fork failed
         std::cerr << tokens[0] << ": failed to execute command" << std::endl;
     else if (pid == 0) // child process
-    {
-        int status = execvp(argv[0], const_cast<char *const *>(argv.data()));
+    {   
+        bool redirect = false;
+        int index;
+        for(int i=0; i<argv.size() && !redirect; i++){
+            if(argv[i][0] == '>') {
+                redirect = true;
+                index = i;
+            }
+        }
+        int status;
+        if(!redirect)
+            status = execvp(argv[0], const_cast<char *const *>(argv.data()));
+        else{
+            std::vector<const char *> argv_copy;
+            for (int i=0; i<index; i++)
+                argv_copy.push_back(argv[i]);
+            argv_copy.push_back(nullptr);
+            status = execvp(argv[0], const_cast<char *const *>(argv_copy.data()));
+            int fd = open(argv[index+1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+            dup2(fd, STDOUT_FILENO);
+        }
 
         if (status != 0)
         {
