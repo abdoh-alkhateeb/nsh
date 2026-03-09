@@ -11,9 +11,17 @@ bool Builtins::handle(const std::vector<std::string> &tokens)
     if(tokens.empty())
         return true;
 
-    history.push_back(tokens[0]);
+    std::string command;
 
-   
+    for (size_t i = 0; i < tokens.size(); i++)
+    {
+       command += tokens[i];
+       if (i != tokens.size() - 1)
+          command += " ";
+    }
+
+    history.push_back(command);
+
     if (tokens[0] == "history")
     {
         for (size_t i = 0; i < history.size(); i++)
