@@ -1,13 +1,14 @@
 cmake_minimum_required(VERSION 3.10)
-project(nsh LANGUAGES CXX)
+
+project(nsh)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-include_directories(${CMAKE_SOURCE_DIR}/include)
+include_directories(include)
 
-file(GLOB SOURCES
-    ${CMAKE_SOURCE_DIR}/src/*.cpp
+add_executable(nsh
+    src/main.cpp
+    src/parser.cpp
+    src/executer.cpp
+    src/builtins.cpp
 )
-
-add_executable(nsh ${SOURCES})
