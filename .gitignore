@@ -45,3 +45,4 @@ build
 
 # VS Code configuration
 .vscode
+test.cpp
