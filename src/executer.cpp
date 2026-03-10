@@ -19,6 +19,7 @@ void Executer::execute(const std::vector<std::string> &tokens)
     int stdo = dup(STDOUT_FILENO);
     int fd;
     bool file_opened = false;
+    bool background_process = false;
     // Copying the contents of the token vector to argv vector
     for (size_t i = 0; i < tokens.size(); i++) {
         if (tokens.at(i) == ">") {
@@ -28,10 +29,15 @@ void Executer::execute(const std::vector<std::string> &tokens)
             dup2(fd, STDOUT_FILENO);
             close(fd);
             file_opened = true;
-            break;
+            i++;
         }
+        else if (tokens.at(i) == "&") {
+            background_process = true;
+        }   
         else argv.push_back((tokens.at(i)).c_str());
     } 
+
+
 
     argv.push_back(nullptr);
     // pid_t is used to store process IDs, fork is used to return an id to the process
@@ -60,6 +66,7 @@ void Executer::execute(const std::vector<std::string> &tokens)
     }
     else // parent process (pid > 0) 
     {
+        if (!background_process)
         waitpid(pid, nullptr, 0);
 
         // We need to redirect the output stream to stdout for the parent process as well, so that nsh> does not get printed in the text file!!!! (took me hours to learn this)
