@@ -1,0 +1,3 @@
+/Users/yassineahmedmostafa/fork1/fork_nsh/program/CMakeFiles/MyProgram.dir
+/Users/yassineahmedmostafa/fork1/fork_nsh/program/CMakeFiles/edit_cache.dir
+/Users/yassineahmedmostafa/fork1/fork_nsh/program/CMakeFiles/rebuild_cache.dir
