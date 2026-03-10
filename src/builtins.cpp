@@ -3,6 +3,8 @@
 #include <shellMessage.hpp>
 #include "stdlib.h" // idk why using stdlib.h which is for c instead of c++ cstdlib, will ignore for now.
 
+std::vector<std::string> Builtins::history;
+
 shellMessage Builtins::handleCd(const std::vector<std::string> &tokens) {
     shellMessage msg; // will store all output
 
@@ -24,11 +26,20 @@ shellMessage Builtins::handleCd(const std::vector<std::string> &tokens) {
     return msg;
 }
 
+shellMessage Builtins::handleHistory() {
+    shellMessage msg;
+    for (int i =0; i < history.size(); ++i)
+        msg.addStdout(std::to_string(i) + "   " + history[i] + "\n");
+    return msg;
+}
+
+
 shellMessage Builtins::handle(const std::vector<std::string> &tokens) {
     const std::string& mainCommand = tokens[0];
 
     if (mainCommand == "exit") exit(EXIT_SUCCESS);
     if (mainCommand == "cd") return handleCd(tokens);
+    if (mainCommand == "history") return handleHistory();
 
     return shellMessage(); // return empty shellMessage if no output
 }

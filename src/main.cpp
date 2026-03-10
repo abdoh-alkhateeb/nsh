@@ -2,6 +2,8 @@
 #include "executer.hpp"
 #include <iostream>
 
+#include "builtins.hpp"
+
 int main() {
     while (true) {
         std::cout << "nsh> ";
@@ -10,7 +12,7 @@ int main() {
 
         if (input.empty())
             continue;
-
+        Builtins::history.push_back(input);
         std::vector<std::string> tokens = Parser::parseInput(input);
         Executer::execute(tokens);
     }
