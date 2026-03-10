@@ -1,5 +1,6 @@
 #include "parser.hpp"
 #include "executer.hpp"
+#include "history.hpp"
 #include <iostream>
 
 int main()
@@ -12,6 +13,9 @@ int main()
 
         if (input.empty())
             continue;
+
+        // record history before tokenizing, preserve original string
+        History::add(input);
 
         std::vector<std::string> tokens = Parser::parseInput(input);
         Executer::execute(tokens);

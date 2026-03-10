@@ -1,10 +1,14 @@
 #include "builtins.hpp"
+#include "history.hpp"
 #include "unistd.h"
 #include "stdlib.h"
 #include <iostream>
 
 bool Builtins::handle(const std::vector<std::string> &tokens)
 {
+    if (tokens.empty())
+        return false;
+
     if (tokens[0] == "exit")
         exit(EXIT_SUCCESS);
     else if (tokens[0] == "cd")
@@ -31,6 +35,11 @@ bool Builtins::handle(const std::vector<std::string> &tokens)
             }
         }
 
+        return true;
+    }
+    else if (tokens[0] == "history")
+    {
+        History::show();
         return true;
     }
 
