@@ -14,6 +14,7 @@ void Executer::execute(const std::vector<std::string> &tokens)
 std::vector<const char*> argv;
 std::string outputFile;
 bool redirect = false;
+bool background = false;
 
     for (size_t i = 0; i < tokens.size(); ++i)
 {
@@ -24,11 +25,13 @@ bool redirect = false;
         if (i + 1 < tokens.size())
             outputFile = tokens[i + 1];
         else
-        {
             std::cerr << "Syntax error: no file after >" << std::endl;
-            return;
-        }
 
+        break;
+    }
+    else if (tokens[i] == "&")
+    {
+        background = true;
         break;
     }
     else
@@ -72,6 +75,8 @@ argv.push_back(nullptr);
             std::cerr << tokens[0] << ": " << msg << std::endl;
         }
     }
-    else // parent process (pid > 0)
+    else
+{
+    if (!background)
         waitpid(pid, nullptr, 0);
 }
