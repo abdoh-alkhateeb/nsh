@@ -1,11 +1,12 @@
 #pragma once
 #include <string>
 #include <vector>
+#include "shellMessage.hpp"
 
 class Builtins
 {
 public:
-    static bool handleCd(const std::vector<std::string> &tokens);
+    static shellMessage handleCd(const std::vector<std::string> &tokens);
 
-    static bool handle(const std::vector<std::string> &tokens);
+    static shellMessage handle(const std::vector<std::string> &tokens);
 };

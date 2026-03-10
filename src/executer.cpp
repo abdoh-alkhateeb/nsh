@@ -13,17 +13,19 @@ std::vector<const char *> Executer::stringVectorToCString(const std::vector<std:
     return cStrVec;
 }
 
-std::string Executer::runCommand(std::vector<const char *> argv) { //
+shellMessage Executer::runCommand(std::vector<const char *> argv) {
+    shellMessage msg; // will store both stdout and stderr
+
     int pipefd[2];
     if (pipe(pipefd) == -1) {
-        std::cerr << argv[0] << ": failed to create pipe" << std::endl;
-        return "";
+        msg.addStderr(std::string(argv[0]) + ": failed to create pipe\n");
+        return msg;
     }
 
     pid_t pid = fork();
     if (pid == -1) {
-        std::cerr << argv[0] << ": failed to fork" << std::endl;
-        return "";
+        msg.addStderr(std::string(argv[0]) + ": failed to fork\n");
+        return msg;
     }
 
     if (pid == 0) { // child procccess
@@ -34,36 +36,77 @@ std::string Executer::runCommand(std::vector<const char *> argv) { //
 
         int status = execvp(argv[0], const_cast<char *const *>(argv.data()));
         if (status != 0) {
-            std::string msg = "failed to execute command";
+            std::string errMsg = "failed to execute command";
             if (errno == ENOENT)
-                msg = "command not found ";
-            std::cerr << argv[0] << ": " << msg << std::endl;
+                errMsg = "command not found ";
+            std::cerr << argv[0] << ": " << errMsg << std::endl; // child still writes to stderr as text is redirected now
         }
         _exit(1);
     }
     close(pipefd[1]);
     char buffer[128];
-    std::string output;
     ssize_t count;
 
     while ((count = read(pipefd[0], buffer, sizeof(buffer))) > 0) {
-        output.append(buffer, count);
+        msg.addStdout(std::string(buffer, count));
     }
 
     close(pipefd[0]);
 
     int status;
-    waitpid(pid, &status, 0); // wait for to finish executing
-    return output; //return the output stream of stderr and stout as a string
+    waitpid(pid, &status, 0); // wait for child to finish
+    return msg; // return combined stdout and stderr as shellMessage
+}
 
+std::vector<std::string> Executer::splitVectorBefore(const std::vector<std::string>& vec, int idx) {
+    std::vector<std::string> result;
+    if (idx <= 0) return result;
+    if (idx > vec.size()) idx = vec.size();
+
+    for (int i = 0; i < idx; i++)
+        result.push_back(vec[i]);
+    return result;
+}
+
+int Executer::getOutputRedirectionIdx(const std::vector<std::string> &tokens) {
+    for (int i=0; i < tokens.size(); ++i)
+        if (tokens[i] == ">" || tokens[i] == ">>") return i;
+    return -1;
 }
 
 void Executer::execute(const std::vector<std::string> &tokens) {
-    if (Builtins::handle(tokens)) return;
+    int idx = getOutputRedirectionIdx(tokens);
+    shellMessage msg;
+
+    // No output redirection
+    if (idx < 0) {
+        msg = Builtins::handle(tokens);
+        if (msg.isEmpty()) {
+            auto argv = stringVectorToCString(tokens);
+            msg = runCommand(argv);
+        }
+        msg.print();
+        return;
+    }
+
+    // Ensure there is a file after the redirection symbol
+    if (idx + 1 >= tokens.size()) {
+        shellMessage err;
+        err.addStderr("syntax error: no file specified for redirection\n");
+        err.print();
+        return;
+    }
 
     // auto is equivalent of java var keyword for nicer readability.
-    auto argv = stringVectorToCString(tokens);
+    auto splitMessage = splitVectorBefore(tokens, idx);
 
-    std::string output = runCommand(argv);
-    std::cout << output << std::endl;
+    msg = Builtins::handle(splitMessage);
+    if (msg.isEmpty()) {
+        auto argv = stringVectorToCString(splitMessage);
+        msg = runCommand(argv);
+    }
+
+    // Write output to file
+    bool append = tokens[idx] == ">>";
+    if (!msg.outputToFile(tokens[idx + 1], append)) std::cout << "Error writing to file\n";
 }

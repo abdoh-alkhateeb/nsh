@@ -1,32 +1,35 @@
 #include "builtins.hpp"
 #include "unistd.h"
+#include <shellMessage.hpp>
 #include "stdlib.h" // idk why using stdlib.h which is for c instead of c++ cstdlib, will ignore for now.
 #include <iostream>
 
-bool Builtins::handleCd(const std::vector<std::string> &tokens) {
+shellMessage Builtins::handleCd(const std::vector<std::string> &tokens) {
+    shellMessage msg; // will store all output
+
     size_t argc = tokens.size();
     std::string path = argc == 1 ? "~" : tokens[1];
     if (argc > 2)
-        std::cerr << "cd: too many arguments" << std::endl;
+        msg.addStderr("cd: too many arguments\n");
     else {
         int status = chdir(path == "~" ? getenv("HOME") : path.c_str());
         if (status != 0) {
-            std::string msg = "failed to change directory";
+            std::string errMsg = "failed to change directory";
 
-            if (errno == ENOENT) msg = "no such file or directory";
-            else if (errno == EACCES) msg = "permission denied";
+            if (errno == ENOENT) errMsg = "no such file or directory";
+            else if (errno == EACCES) errMsg = "permission denied";
 
-            std::cerr << "cd: " << msg << ": " << path << std::endl;
+            msg.addStderr("cd: " + errMsg + ": " + path + "\n");
         }
     }
-    return true;
+    return msg;
 }
 
-bool Builtins::handle(const std::vector<std::string> &tokens) {
+shellMessage Builtins::handle(const std::vector<std::string> &tokens) {
     const std::string& mainCommand = tokens[0];
 
     if (mainCommand == "exit") exit(EXIT_SUCCESS);
     if (mainCommand == "cd") return handleCd(tokens);
 
-    return false;
+    return shellMessage(); // return empty shellMessage if no output
 }

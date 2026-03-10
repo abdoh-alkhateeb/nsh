@@ -8,6 +8,7 @@ add_executable(nsh
         src/executer.cpp
         src/parser.cpp
         src/fileHandling.cpp
+        src/shellMessage.cpp
 )
 
 target_include_directories(nsh PRIVATE include src)
