@@ -16,7 +16,6 @@ void Executer::execute(const std::vector<std::string> &tokens)
     std::string outfile = "";
     bool background = false;
 
-    
     for (int i = 0; i < tokens.size(); i++)
     {
         if (tokens[i] == ">")
@@ -31,6 +30,7 @@ void Executer::execute(const std::vector<std::string> &tokens)
             args.push_back(tokens[i]);
     }
 
+    
     std::vector<const char *> argv;
     for (const std::string &token : args)
         argv.push_back(token.c_str());
@@ -40,9 +40,9 @@ void Executer::execute(const std::vector<std::string> &tokens)
 
     if (pid < 0) 
         std::cerr << args[0] << ": failed to execute command" << std::endl;
-    else if (pid == 0)
+    else if (pid == 0) 
     {
-        
+       
         if (!outfile.empty())
         {
             int fd = open(outfile.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
