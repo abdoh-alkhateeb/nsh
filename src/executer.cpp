@@ -35,11 +35,19 @@ void Executer::execute(const std::vector<std::string> &tokens)
         outputFile = tokens[redirectIndex + 1];
     }
 
+    bool background = false;
+
+    if (!tokens.empty() && tokens.back() == "&")
+        background = true;
+
     std::vector<const char *> argv;
 
     int limit = tokens.size();
+
     if (redirectIndex != -1)
         limit = redirectIndex;
+    else if (background)
+        limit--;
 
     for (int i = 0; i < limit; i++)
         argv.push_back(tokens[i].c_str());
@@ -78,5 +86,8 @@ void Executer::execute(const std::vector<std::string> &tokens)
         }
     }
     else // parent process (pid > 0)
-        waitpid(pid, nullptr, 0);
+    {
+        if (!background)
+            waitpid(pid, nullptr, 0);
+    }
 }
