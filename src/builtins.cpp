@@ -2,11 +2,25 @@
 #include "unistd.h"
 #include "stdlib.h"
 #include <iostream>
+#include <vector>
+
+static std::vector<std::string> historyList;
+
+void Builtins::addToHistory(const std::string &command)
+{
+    historyList.push_back(command);
+}
 
 bool Builtins::handle(const std::vector<std::string> &tokens)
 {
     if (tokens[0] == "exit")
         exit(EXIT_SUCCESS);
+    else if (tokens[0] == "history")
+    {
+        for (size_t i = 0; i < historyList.size(); i++)
+            std::cout << i + 1 << " " << historyList[i] << std::endl;
+        return true;
+    }
     else if (tokens[0] == "cd")
     {
         size_t argc = tokens.size();
