@@ -5,7 +5,6 @@
 #include <iostream>
 #include <vector>
 #include <fcntl.h> // for open()
-
 void Executer::execute(const std::vector<std::string> &tokens)
 {
     if (Builtins::handle(tokens))
@@ -13,20 +12,30 @@ void Executer::execute(const std::vector<std::string> &tokens)
 
     std::vector<const char *> argv;
     std::string outputFile = "";
+    bool runInBackground = false; // 1. Flag for background execution
 
-    // Hint: Only pass to execvp all tokens up to > (exclusive)
     for (size_t i = 0; i < tokens.size(); ++i)
     {
         if (tokens[i] == ">")
         {
             if (i + 1 < tokens.size()) {
-                outputFile = tokens[i + 1]; // Save the filename
+                outputFile = tokens[i + 1]; 
             }
-            break; // Stop adding tokens to argv!
+            break; 
         }
+        else if (tokens[i] == "&")
+        {
+            // 2. Set the flag to true if we see '&'
+            runInBackground = true;
+            continue; // Skip adding '&' to argv
+        }
+        
         argv.push_back(tokens[i].c_str());
     }
     argv.push_back(nullptr);
+
+    // If argv is empty (e.g., user just typed "&"), safely return
+    if (argv.size() == 1) return;
 
     pid_t pid = fork();
 
@@ -34,7 +43,6 @@ void Executer::execute(const std::vector<std::string> &tokens)
         std::cerr << tokens[0] << ": failed to execute command" << std::endl;
     else if (pid == 0) // child process
     {
-        // Hint: implement > using open and dup2
         if (!outputFile.empty())
         {
             int fd = open(outputFile.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
@@ -60,5 +68,11 @@ void Executer::execute(const std::vector<std::string> &tokens)
         }
     }
     else // parent process (pid > 0)
-        waitpid(pid, nullptr, 0);
+    {
+        // 3. Only wait for the child if runInBackground is false!
+        if (!runInBackground) 
+        {
+            waitpid(pid, nullptr, 0);
+        }
+    }
 }
