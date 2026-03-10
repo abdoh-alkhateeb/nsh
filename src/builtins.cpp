@@ -3,8 +3,20 @@
 #include "stdlib.h"
 #include <iostream>
 
+// Useful for history function.
+std::vector<std::string> inputs;
+
+
 bool Builtins::handle(const std::vector<std::string> &tokens)
 {
+    // To be used when history function is used
+    std::string whole_command;
+    for (const std::string& token : tokens) {
+        whole_command += token;
+    }
+    inputs.push_back(whole_command);
+
+
     if (tokens[0] == "exit")
         exit(EXIT_SUCCESS);
     else if (tokens[0] == "cd")
@@ -37,6 +49,14 @@ bool Builtins::handle(const std::vector<std::string> &tokens)
             }
         }
 
+      
+      return true;
+    }
+    else if (tokens[0] == "history") {
+        int i = 0;
+        for (std::string& command : inputs) {
+            std::cout << i++ << " " << command << std::endl;
+        }
         return true;
     }
 
