@@ -2,7 +2,6 @@
 #include "unistd.h"
 #include <shellMessage.hpp>
 #include "stdlib.h" // idk why using stdlib.h which is for c instead of c++ cstdlib, will ignore for now.
-#include <iostream>
 
 shellMessage Builtins::handleCd(const std::vector<std::string> &tokens) {
     shellMessage msg; // will store all output
