@@ -1,8 +1,8 @@
 #include "parser.hpp"
 #include <sstream>
 
-std::vector<std::string> Parser::parseInput(const std::string &input)
-{
+// takes a strings and splits it a vector of strings (tokens) seperated by spaces
+std::vector<std::string> Parser::parseInput(const std::string &input) {
     std::stringstream ss(input);
     std::string token;
     std::vector<std::string> tokens;

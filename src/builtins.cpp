@@ -1,38 +1,48 @@
 #include "builtins.hpp"
 #include "unistd.h"
-#include "stdlib.h"
-#include <iostream>
+#include <shellMessage.hpp>
+#include "stdlib.h" // idk why using stdlib.h which is for c instead of c++ cstdlib, will ignore for now.
 
-bool Builtins::handle(const std::vector<std::string> &tokens)
-{
-    if (tokens[0] == "exit")
-        exit(EXIT_SUCCESS);
-    else if (tokens[0] == "cd")
-    {
-        size_t argc = tokens.size();
-        std::string path = argc == 1 ? "~" : tokens[1];
+std::vector<std::string> Builtins::history;
 
-        if (argc > 2)
-            std::cerr << "cd: too many arguments" << std::endl;
-        else
-        {
-            int status = chdir(path == "~" ? getenv("HOME") : path.c_str());
+shellMessage Builtins::handleCd(const std::vector<std::string> &tokens) {
+    shellMessage msg; // will store all output
 
-            if (status != 0)
-            {
-                std::string msg = "failed to change directory";
+    size_t argc = tokens.size();
+    std::string path = argc == 1 ? "~" : tokens[1];
+    if (argc > 2)
+        msg.addStderr("cd: too many arguments\n");
+    else {
+        int status = chdir(path == "~" ? getenv("HOME") : path.c_str());
+        if (status != 0) {
+            std::string errMsg = "failed to change directory";
 
-                if (errno == ENOENT)
-                    msg = "no such file or directory";
-                else if (errno == EACCES)
-                    msg = "permission denied";
+            if (errno == ENOENT) errMsg = "no such file or directory";
+            else if (errno == EACCES) errMsg = "permission denied";
 
-                std::cerr << "cd: " << msg << ": " << path << std::endl;
-            }
+            msg.addStderr("cd: " + errMsg + ": " + path + "\n");
         }
-
-        return true;
     }
+    return msg;
+}
 
-    return false;
+shellMessage Builtins::handleHistory() {
+    shellMessage msg;
+    for (int i =0; i < history.size(); ++i)
+        msg.addStdout(std::to_string(i) + "   " + history[i] + "\n");
+    return msg;
+}
+
+bool Builtins::isBuiltin(const std::string& cmd) {
+    return (cmd == "cd" || cmd == "history" || cmd == "exit");
+}
+
+shellMessage Builtins::handle(const std::vector<std::string> &tokens) {
+    const std::string& mainCommand = tokens[0];
+
+    if (mainCommand == "exit") exit(EXIT_SUCCESS);
+    if (mainCommand == "cd") return handleCd(tokens);
+    if (mainCommand == "history") return handleHistory();
+
+    return shellMessage(); // return empty shellMessage if no output
 }
