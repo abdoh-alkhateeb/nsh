@@ -13,9 +13,17 @@ void Executer::execute(const std::vector<std::string> &tokens)
         return;
 
     std::vector<const char *> argv;
+    bool background = false;
 
     for (const std::string &token : tokens)
         argv.push_back(token.c_str());
+
+    if (!tokens.empty() && tokens.back() == "&")
+    {
+        background = true;
+        argv[tokens.size() - 1] = nullptr;
+    }
+
     argv.push_back(nullptr);
 
     pid_t pid = fork();
@@ -65,5 +73,8 @@ void Executer::execute(const std::vector<std::string> &tokens)
         }
     }
     else // parent process (pid > 0)
-        waitpid(pid, nullptr, 0);
+    {
+        if (!background)
+            waitpid(pid, nullptr, 0);
+    }
 }
