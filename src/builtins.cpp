@@ -3,8 +3,21 @@
 #include "stdlib.h"
 #include <iostream>
 
+// the list that will have the history
+static std::vector<std::string> history_list;
+
 bool Builtins::handle(const std::vector<std::string> &tokens)
-{
+{   
+    // Adding written command to the history vector
+    std::string full_command = "";
+    for (size_t i = 0; i < tokens.size(); ++i) {
+        full_command += tokens[i];
+        if (i != tokens.size() - 1) {
+            full_command += " ";
+        }
+    }
+    history_list.push_back(full_command);
+
     if (tokens[0] == "exit")
         exit(EXIT_SUCCESS);
     else if (tokens[0] == "cd")
@@ -31,6 +44,13 @@ bool Builtins::handle(const std::vector<std::string> &tokens)
             }
         }
 
+        return true;
+    }
+    else if (tokens[0]=="history") {
+        for (size_t i = 0; i < history_list.size(); ++i)
+        {
+            std::cout << (i + 1) << " " << history_list[i] << std::endl;
+        }
         return true;
     }
 
