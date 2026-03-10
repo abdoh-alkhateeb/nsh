@@ -4,36 +4,54 @@
 #include "sys/wait.h"
 #include <iostream>
 #include <vector>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/wait.h>
 
 void Executer::execute(const std::vector<std::string> &tokens)
 {
-    if (Builtins::handle(tokens))
+    if (tokens.empty())
         return;
-
+    if (Builtins::handle(tokens)) return;
+    int out_fd = -1;
+	bool is_background = false;
     std::vector<const char *> argv;
-
-    for (const std::string &token : tokens)
-        argv.push_back(token.c_str());
+	
+	for (size_t i = 0; i < tokens.size(); i++)
+	{
+		if(tokens[i] == "&")
+		{
+			is_background = true;
+			continue;
+		}
+		if(tokens[i] == ">")
+		{
+			out_fd = open(tokens[i+1].c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
+			break;
+		}
+		argv.push_back(tokens[i].c_str());
+	}
     argv.push_back(nullptr);
-
     pid_t pid = fork();
 
     if (pid < 0) // fork failed
-        std::cerr << tokens[0] << ": failed to execute command" << std::endl;
+        perror("fork");
     else if (pid == 0) // child process
     {
-        int status = execvp(argv[0], const_cast<char *const *>(argv.data()));
-
-        if (status != 0)
-        {
-            std::string msg = "failed to execute command";
-
-            if (errno == ENOENT)
-                msg = "command not found";
-
-            std::cerr << tokens[0] << ": " << msg << std::endl;
-        }
-    }
+	if (out_fd != -1)
+	{
+		dup2(out_fd, 1);
+		close(out_fd);
+	}
+	execvp(argv[0], (char**)argv.data());
+	perror("execvp");
+	exit(1);
+     }
     else // parent process (pid > 0)
-        waitpid(pid, nullptr, 0);
+    {
+        if (!is_background){waitpid(pid, nullptr, 0);}
+	if(out_fd != -1) close(out_fd);
+    }
 }
+
+

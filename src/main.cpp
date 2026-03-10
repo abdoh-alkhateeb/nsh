@@ -1,7 +1,7 @@
 #include "parser.hpp"
 #include "executer.hpp"
 #include <iostream>
-
+#include <builtins.hpp>
 int main()
 {
     while (true)
@@ -9,7 +9,7 @@ int main()
         std::cout << "nsh> ";
         std::string input;
         std::getline(std::cin, input);
-
+	Builtins::add_to_history(input);
         if (input.empty())
             continue;
 
