@@ -1,0 +1,2 @@
+ls xyz >  (without file names)
+using > without file names
