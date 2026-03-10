@@ -14,10 +14,16 @@ void Executer::execute(const std::vector<std::string> &tokens)
         return;
     if (Builtins::handle(tokens)) return;
     int out_fd = -1;
+	bool is_background = false;
     std::vector<const char *> argv;
-
+	
 	for (size_t i = 0; i < tokens.size(); i++)
 	{
+		if(tokens[i] == "&")
+		{
+			is_background = true;
+			continue;
+		}
 		if(tokens[i] == ">")
 		{
 			out_fd = open(tokens[i+1].c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
@@ -43,7 +49,7 @@ void Executer::execute(const std::vector<std::string> &tokens)
      }
     else // parent process (pid > 0)
     {
-        waitpid(pid, nullptr, 0);
+        if (!is_background){waitpid(pid, nullptr, 0);}
 	if(out_fd != -1) close(out_fd);
     }
 }
