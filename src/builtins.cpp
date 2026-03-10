@@ -49,7 +49,6 @@ bool Builtins::handle(const std::vector<std::string> &tokens)
     else if (tokens[0] == "history")
         {
           for (size_t i = 0; i < history.size(); i++) {
-            // Prints like: "  1  ls -l"
             std::cout << "  " << (i + 1) << "  " << history[i] << std::endl;
         }
         return true;
