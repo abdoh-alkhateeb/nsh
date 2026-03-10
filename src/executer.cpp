@@ -4,6 +4,7 @@
 #include "sys/wait.h"
 #include <iostream>
 #include <vector>
+#include <fcntl.h>
 
 void Executer::execute(const std::vector<std::string> &tokens)
 {
@@ -36,4 +37,8 @@ void Executer::execute(const std::vector<std::string> &tokens)
     }
     else // parent process (pid > 0)
         waitpid(pid, nullptr, 0);
+
+	dup2(fd, STDOUT_FILENO)
+	int fd = open("file.txt", O_WRONLY | O_CREAT |O_TRUNC, 0644);
+
 }

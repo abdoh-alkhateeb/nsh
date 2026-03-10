@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.10)
+project(nsh)
+
+add_executable(nsh main.cpp)
+add_executable(nsh builtins.cpp)
+add_executable(nsh parser.cpp)
+add_executable(nsh executer.cpp)
