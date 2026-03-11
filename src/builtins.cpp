@@ -2,6 +2,31 @@
 #include "unistd.h"
 #include "stdlib.h"
 #include <iostream>
+#include <errno.h>
+#include <string.h>
+#include <cstring>
+#include <vector>
+#include <readline/history.h>
+
+static std::vector<std::string> command_history;
+static const size_t MAX_HISTORY = 1000;
+
+void Builtins::addToHistory(const std::string& cmd) {
+
+    if (cmd.empty()) return;
+
+    if (!command_history.empty() && command_history.back() == cmd) {
+        return;
+    }
+
+    command_history.push_back(cmd);
+
+    if (command_history.size() > MAX_HISTORY) {
+        command_history.erase(command_history.begin());
+    }
+
+    add_history(cmd.c_str());
+}
 
 bool Builtins::handle(const std::vector<std::string> &tokens)
 {
@@ -31,6 +56,19 @@ bool Builtins::handle(const std::vector<std::string> &tokens)
             }
         }
 
+        return true;
+    }
+
+    else if (tokens[0] == "history")
+    {
+        if (command_history.empty()) {
+            std::cout << "No commands in history" << std::endl;
+            return true;
+        }
+
+        for (size_t i = 0; i < command_history.size(); ++i) {
+            std::cout << (i + 1) << "  " << command_history[i] << std::endl;
+        }
         return true;
     }
 
