@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/nsh.dir/main.cpp.o CMakeFiles/nsh.dir/parser.cpp.o CMakeFiles/nsh.dir/executer.cpp.o CMakeFiles/nsh.dir/builtins.cpp.o -o nsh 

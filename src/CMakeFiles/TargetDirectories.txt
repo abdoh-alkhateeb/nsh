@@ -1,0 +1,3 @@
+/home/youssef_alfred/nsh/src/CMakeFiles/nsh.dir
+/home/youssef_alfred/nsh/src/CMakeFiles/edit_cache.dir
+/home/youssef_alfred/nsh/src/CMakeFiles/rebuild_cache.dir

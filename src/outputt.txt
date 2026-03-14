@@ -1,0 +1,24 @@
+CMakeCache.txt
+CMakeFiles
+CMakeLists.txt
+Makefile
+builtins.cpp
+cmake_install.cmake
+executer.cpp
+main.cpp
+nsh
+output.txt
+outputt.txt
+parser.cpp
+nsh> CMakeCache.txt
+CMakeFiles
+CMakeLists.txt
+Makefile
+builtins.cpp
+cmake_install.cmake
+executer.cpp
+main.cpp
+nsh
+outputt.txt
+parser.cpp
+nsh> 

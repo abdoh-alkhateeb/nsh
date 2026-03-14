@@ -2,8 +2,7 @@
 #include "unistd.h"
 #include "stdlib.h"
 #include <iostream>
-
-bool Builtins::handle(const std::vector<std::string> &tokens)
+bool Builtins::handle(const std::vector<std::string> &tokens , const std::vector<std::string> &h )
 {
     if (tokens[0] == "exit")
         exit(EXIT_SUCCESS);
@@ -33,6 +32,14 @@ bool Builtins::handle(const std::vector<std::string> &tokens)
 
         return true;
     }
-
-    return false;
+    else if(tokens[0] == "history"){
+		for (int i =0; i< h.size();i++){
+		std::cout<< h[i]<<std::endl;
+		}
+		return true;
+	}
+     return false;
 }
+
+   
+
