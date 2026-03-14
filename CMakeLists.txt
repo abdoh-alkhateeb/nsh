@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
 project(nsh)
-add_executable(myprog src/builtins.cpp src/executer.cpp src/main.cpp src/parser.cpp)
-target_include_directories(myprog PRIVATE include)
+add_compile_options(-std=c++17 -Wall)
+add_executable(nsh src/main.cpp src/builtins.cpp src/executer.cpp src/parser.cpp)
+target_include_directories(nsh PRIVATE include)
