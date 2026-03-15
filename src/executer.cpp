@@ -11,15 +11,31 @@ void Executer::execute(const std::vector<std::string> &tokens)
         return;
 
     std::vector<const char *> argv;
-
-    for (const std::string &token : tokens)
+    bool shouldRedirect = false;
+    bool shouldBackground = false;
+    for (const std::string &token : tokens){
+        if(token == ">"){
+           shouldRedirect = true;
+            break;
+            
+        }
+        else if  (token == "&"){
+            shouldBackground = true;
+            break;
+        }
+    
         argv.push_back(token.c_str());
+    }
     argv.push_back(nullptr);
 
     pid_t pid = fork();
-
-    if (pid == 0)
+    
+     if (pid == 0)
     {
+        if (shouldRedirect){
+    int fd = open("samerfiles.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644); 
+    dup2(fd, STDOUT_FILENO);
+        }
         int status = execvp(argv[0], const_cast<char *const *>(argv.data()));
 
         if (status != 0)
@@ -34,6 +50,8 @@ void Executer::execute(const std::vector<std::string> &tokens)
     }
     else if (pid == -1)
         std::cerr << tokens[0] << ": failed to execute command" << std::endl;
-    else
+     else{
+         if(!shouldBackground){
         waitpid(pid, nullptr, 0);
+     }
 }
