@@ -1,4 +1,6 @@
 #include "parser.hpp"
+#include <vector>
+#include <string>
 #include "executer.hpp"
 #include <iostream>
 
