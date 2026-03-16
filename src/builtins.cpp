@@ -3,6 +3,8 @@
 #include "stdlib.h"
 #include <iostream>
 
+extern std::vector<std::string> history;
+
 bool Builtins::handle(const std::vector<std::string> &tokens)
 {
     if (tokens[0] == "exit")
@@ -31,6 +33,14 @@ bool Builtins::handle(const std::vector<std::string> &tokens)
             }
         }
 
+        return true;
+    }
+    else if(tokens[0] == "history")
+    {
+        for(size_t i = 0; i < history.size(); i++)
+        {
+            std::cout << i + 1 << " " << history[i] << std::endl;
+        }
         return true;
     }
 
