@@ -9,11 +9,19 @@
 using namespace std;
 
 int main() {
-    string input;
+	string input;
+	vector<string> history;
 
     while (true) {
         cout << "shell> ";
         getline(cin, input);
+	history.push_back(input);
+	
+	if (input == "history") {
+    for (size_t i = 0; i < history.size(); i++)
+        cout << i + 1 << " " << history[i] << endl;
+    continue;
+}
 
         if (input == "exit")
             break;
