@@ -7,6 +7,25 @@
 
 void Executer::execute(const std::vector<std::string> &tokens)
 {
+
+int redirectIndex = -1;
+
+for(int i = 0; args[i] != NULL; i++){
+    if(string(args[i]) == ">"){
+        redirectIndex = i;
+        break;
+    }
+}
+
+if(redirectIndex != -1){
+    int fd = open(args[redirectIndex + 1], O_CREAT | O_WRONLY | O_TRUNC, 0644);
+
+    dup2(fd, STDOUT_FILENO);
+    close(fd);
+
+    args[redirectIndex] = NULL;
+}
+
     if (Builtins::handle(tokens))
         return;
 
