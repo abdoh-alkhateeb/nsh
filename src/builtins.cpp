@@ -5,6 +5,14 @@
 
 bool Builtins::handle(const std::vector<std::string> &tokens)
 {
+if(tokens[0] == "history")
+{
+	 for(int i = 0; i < history.size(); i++)
+	{
+	 std::cout << i + 1 << " " << history[i] << std::endl;
+	}
+	 return true;
+}
     if (tokens[0] == "exit")
         exit(EXIT_SUCCESS);
     else if (tokens[0] == "cd")
