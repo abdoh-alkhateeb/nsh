@@ -13,7 +13,7 @@ void Executer::execute(const std::vector<std::string> &tokens)
     if (tokens.empty())
         return;
 
-   // Builtins::add_history(tokens);
+    Builtins::add_history(tokens);
 
     bool background = false;
     std::string outfile;
