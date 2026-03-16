@@ -18,6 +18,13 @@ int main() {
         if (input == "exit")
             break;
 
+	bool background = false;
+
+        if (!input.empty() && input.back() == '&') {
+            background = true;
+            input.pop_back();
+        }
+
         string command;
         string outfile;
 
@@ -60,6 +67,7 @@ int main() {
             exit(1);
 
         } else {
+	    if (!background)
             wait(NULL);
         }
     }
