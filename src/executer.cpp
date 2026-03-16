@@ -19,18 +19,18 @@ void Executer::execute(std::vector<std::string> tokens)
 
     pid_t pid = fork();
 
-    if (pid < 0) // fork failed
-        std::cerr << tokens[0] << ": failed to execute command" << std::endl;
-    else if (pid = 0) // child process
+    if (pid < 0){ // fork failed
+        std::cerr << tokens[0] << ": failed to execute command" << std::endl;}
+    else if (pid == 0) // child process
     {
-for (int i=0; i < tokens.size();i++)
+for (int i=0; i < tokens.size();i++){
      if(tokens[i] == ">"){
           int fd = open(tokens[i+1].c_str(), O_CREAT | O_WRONLY | O_TRUNC, 0644);
           dup2(fd, STDOUT_FILENO);
           close(fd);
           tokens.resize(i);
           break;
-}
+}}
 char* argv[tokens.size() + 1];
 for (int i=0; i <tokens.size();i++)
 {
@@ -38,7 +38,7 @@ argv[i]= &tokens[i][0];
 }
 argv[tokens.size()] = nullptr;
 
-   execvp(argv[0],argv);
+   execvp(argv[0],argv);}
         int status;
         if (status != 0)
         {
@@ -49,8 +49,7 @@ argv[tokens.size()] = nullptr;
 
             std::cerr << tokens[0] << ": " << msg << std::endl;
         }
-    }
-    else // parent process (pid > 0)
-int status;
+     else{ // parent process (pid > 0)
         waitpid(pid, nullptr, 0);
+}
 }
