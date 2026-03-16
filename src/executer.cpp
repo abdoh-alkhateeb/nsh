@@ -11,6 +11,15 @@ void Executer::execute(const std::vector<std::string> &tokens)
     if (Builtins::handle(tokens)) {return;}
 
 	std::vector<std::string> args = tokens;
+
+	bool background = false;
+
+	if (!args.empty() && args.back() == "&")
+	{
+    		background = true;
+    		args.pop_back();
+	}
+
 	std::string outputFile;
 
 	for (size_t i = 0; i < args.size(); i++)
@@ -54,5 +63,8 @@ void Executer::execute(const std::vector<std::string> &tokens)
         }
     }
     else // parent process (pid > 0)
-        waitpid(pid, nullptr, 0);
+    	{
+    		if (!background)
+        	waitpid(pid, nullptr, 0);
+	}
 }
