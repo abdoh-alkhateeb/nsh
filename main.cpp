@@ -1,7 +1,4 @@
 #include <iostream>
-#include <unistd.h>
-#include <sys/wait.h>
-#include <cstring>
 #include <vector>
 #include <string>
 
@@ -9,38 +6,24 @@ using namespace std;
 
 int main() {
     vector<string> history;
-    char command[1024];
+    string input;
 
     while (true) {
-        cout << "shell> ";
-        cin.getline(command, 1024);
-        if (strlen(command) == 0) continue;
+        cout << "> ";
+        getline(cin, input);
 
-        history.push_back(command);
+        if (input == "exit") break;
 
-        char* args[100];
-        int i = 0;
-        char* token = strtok(command, " ");
-        while (token) {
-            args[i++] = token;
-            token = strtok(NULL, " ");
-        }
-        args[i] = NULL;
+        history.push_back(input);
 
-        if (strcmp(args[0], "history") == 0) {
-            for (int j = 0; j < history.size(); j++)
-                cout << j + 1 << " " << history[j] << endl;
-            continue;
-        }
-
-        pid_t pid = fork();
-        if (pid == 0) {
-            execvp(args[0], args);
-            perror("execvp failed");
-            exit(1);
+        if (input == "history") {
+            for (size_t i = 0; i < history.size(); i++) {
+                cout << i + 1 << " " << history[i] << endl;
+            }
         } else {
-            wait(NULL);
+            cout << "You typed: " << input << endl;
         }
     }
+
     return 0;
 }
