@@ -22,22 +22,22 @@ int main() {
         }
         args[i] = NULL;
 
+        bool background = false;
+        for (int j = 0; args[j]; j++) {
+            if (strcmp(args[j], "&") == 0) {
+                background = true;
+                args[j] = NULL;
+                break;
+            }
+        }
+
         pid_t pid = fork();
         if (pid == 0) {
-            for (int j = 0; args[j]; j++) {
-                if (strcmp(args[j], ">") == 0) {
-                    int fd = open(args[j + 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
-                    dup2(fd, STDOUT_FILENO);
-                    close(fd);
-                    args[j] = NULL;
-                    break;
-                }
-            }
             execvp(args[0], args);
             perror("execvp failed");
             exit(1);
         } else {
-            wait(NULL);
+            if (!background) wait(NULL);
         }
     }
     return 0;
