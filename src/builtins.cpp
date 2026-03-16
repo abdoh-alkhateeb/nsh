@@ -3,8 +3,17 @@
 #include "stdlib.h"
 #include <iostream>
 
+static std::vector<std::string> history;
+
 bool Builtins::handle(const std::vector<std::string> &tokens)
 {
+    std::string command;
+
+    for (const auto &t : tokens)
+        command += t + " ";
+
+    history.push_back(command);
+
     if (tokens[0] == "exit")
         exit(EXIT_SUCCESS);
     else if (tokens[0] == "cd")
@@ -30,6 +39,14 @@ bool Builtins::handle(const std::vector<std::string> &tokens)
                 std::cerr << "cd: " << msg << ": " << path << std::endl;
             }
         }
+
+        return true;
+    }
+
+    else if (tokens[0] == "history")
+    {
+        for (size_t i = 0; i < history.size(); i++)
+            std::cout << i + 1 << " " << history[i] << std::endl;
 
         return true;
     }
