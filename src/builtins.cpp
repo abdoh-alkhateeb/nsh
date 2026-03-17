@@ -2,9 +2,24 @@
 #include "unistd.h"
 #include "stdlib.h"
 #include <iostream>
+#include <vector>
+#include <string>
+#include <errno.h>
+
+std::vector<std::string> Builtins::historyList;
 
 bool Builtins::handle(const std::vector<std::string> &tokens)
 {
+
+if(tokens.empty())
+return false;
+
+ std::string fullCommand;
+    for (const auto &t : tokens)
+        fullCommand += t + " ";
+    fullCommand.pop_back(); 
+    historyList.push_back(fullCommand);
+
     if (tokens[0] == "exit")
         exit(EXIT_SUCCESS);
     else if (tokens[0] == "cd")
@@ -31,6 +46,13 @@ bool Builtins::handle(const std::vector<std::string> &tokens)
             }
         }
 
+        return true;
+    }
+
+else if (tokens[0] == "history")
+    {
+        for (size_t i = 0; i < historyList.size(); ++i)
+            std::cout << i + 1 << ": " << historyList[i] << std::endl;
         return true;
     }
 
