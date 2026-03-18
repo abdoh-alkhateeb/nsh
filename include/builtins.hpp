@@ -5,5 +5,5 @@
 class Builtins
 {
 public:
-    static bool handle(const std::vector<std::string> &tokens);
+    static bool handle(const std::vector<std::string> &tokens, std::string*, int);
 };
