@@ -1,19 +1,27 @@
 #include <iostream>
 
+#include "builtins.hpp"
 #include "executer.hpp"
 #include "parser.hpp"
-#include "builtins.hpp"
 
 using namespace std;
 
 int main() {
   while (true) {
-    cout << "nsh> ";
+    cout << "nsh> " << flush;
     string input;
-    getline(cin, input);
+
+    if (!getline(cin, input)) {
+      break;
+    }
 
     if (input.empty()) {
       continue;
+    }
+
+    if (input == "exit") {
+      cout << "Goodbye!" << endl;
+      break;
     }
 
     Builtins::addToHistory(input);
