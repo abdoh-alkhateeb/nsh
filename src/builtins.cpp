@@ -5,31 +5,38 @@
 #include <cstdlib>
 #include <iostream>
 
-bool Builtins::handle(const std::vector<std::string>& tokens) {
+using namespace std;
+
+vector<string> Builtins::history;
+
+void Builtins::addToHistory(const string& input) {
+  history.push_back(input);
+}
+
+bool Builtins::handle(const vector<string>& tokens) {
   if (tokens[0] == "exit") {
-    std::exit(EXIT_SUCCESS);
+    exit(EXIT_SUCCESS);
   } else if (tokens[0] == "cd") {
     size_t argc = tokens.size();
-    std::string path = argc == 1 ? "~" : tokens[1];
+    string path = argc == 1 ? "~" : tokens[1];
 
     if (argc > 2) {
-      std::cerr << "cd: too many arguments" << std::endl;
+      cerr << "cd: too many arguments" << endl;
     } else {
-      int status = chdir(path == "~" ? std::getenv("HOME") : path.c_str());
+      int status = chdir(path == "~" ? getenv("HOME") : path.c_str());
 
       if (status != 0) {
-        std::string msg = "failed to change directory";
-
-        if (errno == ENOENT) {
-          msg = "no such file or directory";
-        } else if (errno == EACCES) {
-          msg = "permission denied";
-        }
-
-        std::cerr << "cd: " << msg << ": " << path << std::endl;
+        string msg = "failed to change directory";
+        if (errno == ENOENT) msg = "no such file or directory";
+        else if (errno == EACCES) msg = "permission denied";
+        cerr << "cd: " << msg << ": " << path << endl;
       }
     }
-
+    return true;
+  } else if (tokens[0] == "history") {
+    for (size_t i = 0; i < history.size(); i++) {
+      cout << i + 1 << "  " << history[i] << endl;
+    }
     return true;
   }
 
